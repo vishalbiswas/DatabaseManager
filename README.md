@@ -1,2 +1,2 @@
-# DatabaseManager
-A database manager with all common commands and ability to work with MSSQL, MySQL and Oracle.
+# Visual Studio Projects
+This repository will host my side projects that I'm gonna do while learning C#.
