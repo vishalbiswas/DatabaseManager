@@ -31,7 +31,6 @@
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textBox1 = new System.Windows.Forms.TextBox();
-			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.label2 = new System.Windows.Forms.Label();
 			this.textBox2 = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
@@ -39,6 +38,7 @@
 			this.button1 = new System.Windows.Forms.Button();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.checkBox2 = new System.Windows.Forms.CheckBox();
+			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -92,14 +92,6 @@
 			this.textBox1.Size = new System.Drawing.Size(210, 20);
 			this.textBox1.TabIndex = 1;
 			// 
-			// menuStrip1
-			// 
-			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(275, 24);
-			this.menuStrip1.TabIndex = 0;
-			this.menuStrip1.Text = "menuStrip1";
-			// 
 			// label2
 			// 
 			this.label2.AutoSize = true;
@@ -145,6 +137,7 @@
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(210, 21);
 			this.comboBox1.TabIndex = 5;
+			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.useDefault);
 			// 
 			// button1
 			// 
@@ -179,6 +172,15 @@
 			this.checkBox2.TabIndex = 7;
 			this.checkBox2.Text = "Use Default";
 			this.checkBox2.UseVisualStyleBackColor = true;
+			this.checkBox2.CheckedChanged += new System.EventHandler(this.useDefault);
+			// 
+			// menuStrip1
+			// 
+			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+			this.menuStrip1.Name = "menuStrip1";
+			this.menuStrip1.Size = new System.Drawing.Size(275, 24);
+			this.menuStrip1.TabIndex = 0;
+			this.menuStrip1.Text = "menuStrip1";
 			// 
 			// Form1
 			// 
