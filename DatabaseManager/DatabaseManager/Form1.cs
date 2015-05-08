@@ -54,17 +54,30 @@ namespace DatabaseManager
 			Cursor = Cursors.WaitCursor;
 			switch (comboBox1.SelectedItem.ToString()) {
 				case "MySQL":
-					MySqlConnection conn = new MySqlConnection("user=" + textBox1.Text + ";password=" + textBox2.Text + ";server=localhost;port=3306");
+					MySqlConnection sconn = new MySqlConnection("user=" + textBox1.Text + ";password=" + textBox2.Text + ";server=localhost;port=3306");
 					try
 					{
-						conn.Open();
-						conn.Close();
+						sconn.Open();
+						sconn.Close();
+                        DatabaseSelector DS = new DatabaseSelector(sconn);
+                        DS.Show();
 					}
 					catch (MySqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
 					break;
 				case "MSSQL":
-					IntegrateSecurity = true;
-					break;
+                    string constr;
+                    if (IntegrateSecurity) constr = "Data Source=localhost;Integrated Security=true";
+                    else constr = "Data Source=localhost;Integrated Security=false;User ID = " + textBox1.Text + "; Password = " + textBox2.Text;
+                    SqlConnection mconn = new SqlConnection(constr);
+                    try
+                    {
+                        mconn.Open();
+                        mconn.Close();
+                        DatabaseSelector DS = new DatabaseSelector(mconn);
+                        DS.Show();
+                    }
+                    catch (SqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    break;
 				case "Oracle":
 					//to be implemented
 					break;

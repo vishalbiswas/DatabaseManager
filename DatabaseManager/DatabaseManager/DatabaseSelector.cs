@@ -14,13 +14,31 @@ namespace DatabaseManager
 {
 	public partial class DatabaseSelector : Form
 	{
-		object conn;
-		ushort type;
-		public DatabaseSelector(object con, ushort db)
+		MySqlConnection sconn;
+        SqlConnection mconn;
+        MySqlCommand scom;
+        SqlCommand mcom;
+        MySqlDataAdapter sad;
+        SqlDataAdapter mad;
+        DataSet ds = new DataSet();
+		public DatabaseSelector(MySqlConnection con)
 		{
-			conn = con;
-			type = db;
+			sconn = con;
+            sconn.Open();
+            scom = new MySqlCommand("show databases;", sconn);
+            scom.ExecuteNonQuery();
+            sad = new MySqlDataAdapter(scom);
+            sad.Fill(ds);
 			InitializeComponent();
+            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
+            sconn.Close();
 		}
-	}
+        public DatabaseSelector(SqlConnection con)
+        {
+            mconn = con;
+            InitializeComponent();
+        }
+
+
+    }
 }
