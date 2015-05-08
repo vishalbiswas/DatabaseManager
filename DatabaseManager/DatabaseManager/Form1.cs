@@ -6,6 +6,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Data.SqlClient;
+using MySql.Data;
+using MySql.Data.MySqlClient;
+
 
 namespace DatabaseManager
 {
@@ -42,6 +46,31 @@ namespace DatabaseManager
 				IntegrateSecurity = false;
 				textBox1.Enabled = textBox2.Enabled = true;
 			}
+		}
+
+		private void connect(object sender, EventArgs e)
+		{
+			foreach (Control control in Controls) control.Enabled = false;
+			Cursor = Cursors.WaitCursor;
+			switch (comboBox1.SelectedItem.ToString()) {
+				case "MySQL":
+					MySqlConnection conn = new MySqlConnection("user=" + textBox1.Text + ";password=" + textBox2.Text + ";server=localhost;port=3306");
+					try
+					{
+						conn.Open();
+						conn.Close();
+					}
+					catch (MySqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+					break;
+				case "MSSQL":
+					IntegrateSecurity = true;
+					break;
+				case "Oracle":
+					//to be implemented
+					break;
+			}
+			foreach (Control control in Controls) control.Enabled = true;
+			Cursor = Cursors.Default;
 		}
 	}
 }
