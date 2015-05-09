@@ -12,38 +12,31 @@ using MySql.Data.MySqlClient;
 
 namespace DatabaseManager
 {
-	public partial class DatabaseSelector : Form
-	{
-		MySqlConnection sconn;
+    public partial class Database : Form
+    {
+        MySqlConnection sconn;
         SqlConnection mconn;
         MySqlCommand scom;
         SqlCommand mcom;
         MySqlDataAdapter sad;
         SqlDataAdapter mad;
         DataSet ds = new DataSet();
-		public DatabaseSelector(MySqlConnection con)
-		{
-			sconn = con;
+        public Database(MySqlConnection con, string db, string table)
+        {
+            sconn = con;
             sconn.Open();
-            scom = new MySqlCommand("show databases;", sconn);
+            scom = new MySqlCommand("use "+db+";select * from "+table+";", sconn);
             scom.ExecuteNonQuery();
             sad = new MySqlDataAdapter(scom);
             sad.Fill(ds);
-			InitializeComponent();
-            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
+            InitializeComponent();
+            dataGridView1.DataSource = ds.Tables[0];
             sconn.Close();
-		}
-        public DatabaseSelector(SqlConnection con)
+        }
+        public Database(SqlConnection con, string db, string table)
         {
             mconn = con;
             InitializeComponent();
-        }
-
-        private void next(object sender, EventArgs e)
-        {
-            TableSelector TS = new TableSelector(sconn, listBox1.SelectedItem.ToString());
-            TS.Show();
-            Close();
         }
     }
 }

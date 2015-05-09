@@ -12,28 +12,30 @@ using MySql.Data.MySqlClient;
 
 namespace DatabaseManager
 {
-	public partial class DatabaseSelector : Form
-	{
-		MySqlConnection sconn;
+    public partial class TableSelector : Form
+    {
+        MySqlConnection sconn;
         SqlConnection mconn;
         MySqlCommand scom;
         SqlCommand mcom;
         MySqlDataAdapter sad;
         SqlDataAdapter mad;
         DataSet ds = new DataSet();
-		public DatabaseSelector(MySqlConnection con)
-		{
-			sconn = con;
+        string da;
+        public TableSelector(MySqlConnection con, string db)
+        {
+            da = db;
+            sconn = con;
             sconn.Open();
-            scom = new MySqlCommand("show databases;", sconn);
+            scom = new MySqlCommand("use "+db+";show tables;", sconn);
             scom.ExecuteNonQuery();
             sad = new MySqlDataAdapter(scom);
             sad.Fill(ds);
-			InitializeComponent();
+            InitializeComponent();
             foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
             sconn.Close();
-		}
-        public DatabaseSelector(SqlConnection con)
+        }
+        public TableSelector(SqlConnection con, string db)
         {
             mconn = con;
             InitializeComponent();
@@ -41,8 +43,8 @@ namespace DatabaseManager
 
         private void next(object sender, EventArgs e)
         {
-            TableSelector TS = new TableSelector(sconn, listBox1.SelectedItem.ToString());
-            TS.Show();
+            Database DB = new Database(sconn, da, listBox1.SelectedItem.ToString());
+            DB.Show();
             Close();
         }
     }
