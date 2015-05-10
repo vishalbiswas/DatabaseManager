@@ -36,14 +36,29 @@ namespace DatabaseManager
         public DatabaseSelector(SqlConnection con)
         {
             mconn = con;
+            mconn.Open();
+            mcom = new SqlCommand("exec sp_databases;", mconn);
+            mcom.ExecuteNonQuery();
+            mad = new SqlDataAdapter(mcom);
+            mad.Fill(ds);
             InitializeComponent();
+            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
+            mconn.Close();
         }
 
         private void next(object sender, EventArgs e)
         {
-            TableSelector TS = new TableSelector(sconn, listBox1.SelectedItem.ToString());
-            TS.Show();
-            Close();
+            if (sconn != null)
+            {
+                TableSelector TS = new TableSelector(sconn, listBox1.SelectedItem.ToString());
+                TS.Show();
+            }
+            else if (mconn != null)
+            {
+                TableSelector TS = new TableSelector(mconn, listBox1.SelectedItem.ToString());
+                TS.Show();
+            }
+                Close();
         }
     }
 }

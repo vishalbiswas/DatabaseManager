@@ -37,14 +37,30 @@ namespace DatabaseManager
         }
         public TableSelector(SqlConnection con, string db)
         {
+            da = db;
             mconn = con;
+            mconn.Open();
+            mcom = new SqlCommand("use " + db + ";select table_name from information_schema.tables;", mconn);
+            mcom.ExecuteNonQuery();
+            mad = new SqlDataAdapter(mcom);
+            mad.Fill(ds);
             InitializeComponent();
+            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
+            mconn.Close();
         }
 
         private void next(object sender, EventArgs e)
         {
-            Database DB = new Database(sconn, da, listBox1.SelectedItem.ToString());
-            DB.Show();
+            if (sconn != null)
+            {
+                Database DB = new Database(sconn, da, listBox1.SelectedItem.ToString());
+                DB.Show();
+            }
+            else if (mconn != null)
+            {
+                Database DB = new Database(mconn, da, listBox1.SelectedItem.ToString());
+                DB.Show();
+            }
             Close();
         }
     }

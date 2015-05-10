@@ -36,7 +36,14 @@ namespace DatabaseManager
         public Database(SqlConnection con, string db, string table)
         {
             mconn = con;
+            mconn.Open();
+            mcom = new SqlCommand("use " + db + ";select * from " + table + ";", mconn);
+            mcom.ExecuteNonQuery();
+            mad = new SqlDataAdapter(mcom);
+            mad.Fill(ds);
             InitializeComponent();
+            dataGridView1.DataSource = ds.Tables[0];
+            mconn.Close();
         }
     }
 }
