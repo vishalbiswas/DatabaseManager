@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using Oracle.DataAccess.Client;
+using Npgsql;
 
 
 namespace DatabaseManager
@@ -25,7 +26,7 @@ namespace DatabaseManager
 
 		private void useDefault(object sender, EventArgs e)
 		{
-            if (comboBox1.SelectedItem.ToString() == "Oracle") textBox3.Enabled = label4.Enabled = true;
+            if (comboBox1.SelectedItem.ToString() == "Oracle" || comboBox1.SelectedItem.ToString() == "PostgreSQL") textBox3.Enabled = label4.Enabled = true;
             else textBox3.Enabled = label4.Enabled = false;
 			if (checkBox2.Checked == true)
 			{
@@ -41,6 +42,9 @@ namespace DatabaseManager
 					case "Oracle":
 						//to be implemented
 						break;
+                    case "PostgreSQL":
+                        //to be implemented
+                        break;
 				}
 				textBox1.Enabled = textBox2.Enabled = false;
 			}
@@ -92,6 +96,17 @@ namespace DatabaseManager
                         TS.Show();
                     }
                     catch (OracleException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    break;
+                case "PostgreSQL":
+                    NpgsqlConnection nconn = new NpgsqlConnection("Server=localhost;Port=5432;User Id=" + textBox1.Text + ";Password=" + textBox2.Text + ";Database=" + textBox3.Text + ";");
+                    try
+                    {
+                        nconn.Open();
+                        nconn.Close();
+                        TableSelector TS = new TableSelector(nconn);
+                        TS.Show();
+                    }
+                    catch (NpgsqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
 			}
 			foreach (Control control in Controls) control.Enabled = true;

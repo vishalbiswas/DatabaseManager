@@ -138,7 +138,8 @@
             this.comboBox1.Items.AddRange(new object[] {
             "MySQL/MariaDB",
             "MSSQL",
-            "Oracle"});
+            "Oracle",
+            "PostgreSQL"});
             this.comboBox1.Location = new System.Drawing.Point(62, 55);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(210, 21);
@@ -190,7 +191,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(53, 26);
             this.label4.TabIndex = 6;
-            this.label4.Text = "SID";
+            this.label4.Text = "Database";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // textBox3

@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using Oracle.DataAccess.Client;
+using Npgsql;
 
 namespace DatabaseManager
 {
@@ -18,12 +19,15 @@ namespace DatabaseManager
         MySqlConnection sconn;
         SqlConnection mconn;
         OracleConnection oconn;
+        NpgsqlConnection nconn;
         MySqlCommand scom;
         SqlCommand mcom;
         OracleCommand ocom;
+        NpgsqlCommand ncom;
         MySqlDataAdapter sad;
         SqlDataAdapter mad;
         OracleDataAdapter oad;
+        NpgsqlDataAdapter nad;
         DataSet ds = new DataSet();
         string da;
         public TableSelector(MySqlConnection con, string db)
@@ -64,6 +68,18 @@ namespace DatabaseManager
             foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
             oconn.Close();
         }
+        public TableSelector(NpgsqlConnection con)
+        {
+            nconn = con;
+            nconn.Open();
+            ncom = new NpgsqlCommand("select table_name from information_schema.tables where table_schema = 'public';", nconn);
+            ncom.ExecuteNonQuery();
+            nad = new NpgsqlDataAdapter(ncom);
+            nad.Fill(ds);
+            InitializeComponent();
+            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
+            nconn.Close();
+        }
 
         private void next(object sender, EventArgs e)
         {
@@ -80,6 +96,11 @@ namespace DatabaseManager
             else if (oconn != null)
             {
                 Database DB = new Database(oconn, listBox1.SelectedItem.ToString());
+                DB.Show();
+            }
+            else if (nconn != null)
+            {
+                Database DB = new Database(nconn, listBox1.SelectedItem.ToString());
                 DB.Show();
             }
             Close();

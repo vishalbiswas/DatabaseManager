@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using Oracle.DataAccess.Client;
+using Npgsql;
 
 namespace DatabaseManager
 {
@@ -18,12 +19,15 @@ namespace DatabaseManager
         MySqlConnection sconn;
         SqlConnection mconn;
         OracleConnection oconn;
+        NpgsqlConnection nconn;
         MySqlCommand scom;
         SqlCommand mcom;
         OracleCommand ocom;
+        NpgsqlCommand ncom;
         MySqlDataAdapter sad;
         SqlDataAdapter mad;
         OracleDataAdapter oad;
+        NpgsqlDataAdapter nad;
         DataSet ds = new DataSet();
         public Database(MySqlConnection con, string db, string table)
         {
@@ -60,6 +64,18 @@ namespace DatabaseManager
             InitializeComponent();
             dataGridView1.DataSource = ds.Tables[0];
             oconn.Close();
+        }
+        public Database(NpgsqlConnection con, string table)
+        {
+            nconn = con;
+            nconn.Open();
+            ncom = new NpgsqlCommand("select * from " + table + ";", nconn);
+            ncom.ExecuteNonQuery();
+            nad = new NpgsqlDataAdapter(ncom);
+            nad.Fill(ds);
+            InitializeComponent();
+            dataGridView1.DataSource = ds.Tables[0];
+            nconn.Close();
         }
     }
 }
