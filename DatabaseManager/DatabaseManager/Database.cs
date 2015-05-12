@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using MySql.Data;
 using MySql.Data.MySqlClient;
+using Oracle.DataAccess.Client;
 
 namespace DatabaseManager
 {
@@ -16,10 +17,13 @@ namespace DatabaseManager
     {
         MySqlConnection sconn;
         SqlConnection mconn;
+        OracleConnection oconn;
         MySqlCommand scom;
         SqlCommand mcom;
+        OracleCommand ocom;
         MySqlDataAdapter sad;
         SqlDataAdapter mad;
+        OracleDataAdapter oad;
         DataSet ds = new DataSet();
         public Database(MySqlConnection con, string db, string table)
         {
@@ -44,6 +48,18 @@ namespace DatabaseManager
             InitializeComponent();
             dataGridView1.DataSource = ds.Tables[0];
             mconn.Close();
+        }
+        public Database(OracleConnection con, string table)
+        {
+            oconn = con;
+            oconn.Open();
+            ocom = new OracleCommand("select * from " + table, oconn);
+            ocom.ExecuteNonQuery();
+            oad = new OracleDataAdapter(ocom);
+            oad.Fill(ds);
+            InitializeComponent();
+            dataGridView1.DataSource = ds.Tables[0];
+            oconn.Close();
         }
     }
 }

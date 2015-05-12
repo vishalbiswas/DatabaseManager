@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using MySql.Data;
 using MySql.Data.MySqlClient;
+using Oracle.DataAccess.Client;
 
 namespace DatabaseManager
 {
@@ -16,10 +17,13 @@ namespace DatabaseManager
     {
         MySqlConnection sconn;
         SqlConnection mconn;
+        OracleConnection oconn;
         MySqlCommand scom;
         SqlCommand mcom;
+        OracleCommand ocom;
         MySqlDataAdapter sad;
         SqlDataAdapter mad;
+        OracleDataAdapter oad;
         DataSet ds = new DataSet();
         string da;
         public TableSelector(MySqlConnection con, string db)
@@ -48,6 +52,18 @@ namespace DatabaseManager
             foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
             mconn.Close();
         }
+        public TableSelector(OracleConnection con)
+        {
+            oconn = con;
+            oconn.Open();
+            ocom = new OracleCommand("select table_name from user_tables", oconn);
+            ocom.ExecuteNonQuery();
+            oad = new OracleDataAdapter(ocom);
+            oad.Fill(ds);
+            InitializeComponent();
+            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
+            oconn.Close();
+        }
 
         private void next(object sender, EventArgs e)
         {
@@ -59,6 +75,11 @@ namespace DatabaseManager
             else if (mconn != null)
             {
                 Database DB = new Database(mconn, da, listBox1.SelectedItem.ToString());
+                DB.Show();
+            }
+            else if (oconn != null)
+            {
+                Database DB = new Database(oconn, listBox1.SelectedItem.ToString());
                 DB.Show();
             }
             Close();

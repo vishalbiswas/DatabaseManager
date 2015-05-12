@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using MySql.Data;
 using MySql.Data.MySqlClient;
+using Oracle.DataAccess.Client;
 
 
 namespace DatabaseManager
@@ -24,6 +25,8 @@ namespace DatabaseManager
 
 		private void useDefault(object sender, EventArgs e)
 		{
+            if (comboBox1.SelectedItem.ToString() == "Oracle") textBox3.Enabled = label4.Enabled = true;
+            else textBox3.Enabled = label4.Enabled = false;
 			if (checkBox2.Checked == true)
 			{
 				switch (comboBox1.SelectedItem.ToString())
@@ -79,8 +82,17 @@ namespace DatabaseManager
                     catch (SqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
 				case "Oracle":
-					//to be implemented
-					break;
+                    //to be implemented
+                    OracleConnection oconn = new OracleConnection("User Id=" + textBox1.Text + ";Password=" + textBox2.Text + ";Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SID="+textBox3.Text+")));");
+                    try
+                    {
+                        oconn.Open();
+                        oconn.Close();
+                        TableSelector TS = new TableSelector(oconn);
+                        TS.Show();
+                    }
+                    catch (OracleException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    break;
 			}
 			foreach (Control control in Controls) control.Enabled = true;
 			Cursor = Cursors.Default;
