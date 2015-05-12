@@ -20,7 +20,7 @@ namespace DatabaseManager
 		public Form1()
 		{
 			InitializeComponent();
-			comboBox1.SelectedItem = "MySQL";
+			comboBox1.SelectedItem = "MySQL/MariaDB";
 		}
 
 		private void useDefault(object sender, EventArgs e)
@@ -31,7 +31,7 @@ namespace DatabaseManager
 			{
 				switch (comboBox1.SelectedItem.ToString())
 				{
-					case "MySQL":
+					case "MySQL/MariaDB":
 						textBox1.Text = "root";
 						textBox2.Text = "";
 						break;
@@ -56,7 +56,7 @@ namespace DatabaseManager
 			foreach (Control control in Controls) control.Enabled = false;
 			Cursor = Cursors.WaitCursor;
 			switch (comboBox1.SelectedItem.ToString()) {
-				case "MySQL":
+				case "MySQL/MariaDB":
 					MySqlConnection sconn = new MySqlConnection("user=" + textBox1.Text + ";password=" + textBox2.Text + ";server=localhost;port=3306");
 					try
 					{

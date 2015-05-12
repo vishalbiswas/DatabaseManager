@@ -136,7 +136,7 @@
             this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
-            "MySQL",
+            "MySQL/MariaDB",
             "MSSQL",
             "Oracle"});
             this.comboBox1.Location = new System.Drawing.Point(62, 55);
