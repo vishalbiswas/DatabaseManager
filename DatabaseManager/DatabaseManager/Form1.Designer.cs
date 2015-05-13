@@ -139,7 +139,8 @@
             "MySQL/MariaDB",
             "MSSQL",
             "Oracle",
-            "PostgreSQL"});
+            "PostgreSQL",
+            "DB2"});
             this.comboBox1.Location = new System.Drawing.Point(62, 55);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(210, 21);

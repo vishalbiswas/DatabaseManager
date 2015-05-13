@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="IBM.Data.DB2, Version=9.7.4.4, Culture=neutral, PublicKeyToken=7c307b91aa13d208, processorArchitecture=x86" />
     <Reference Include="Mono.Security">
       <HintPath>..\..\..\..\..\Downloads\Compressed\Mono.Security.dll</HintPath>
     </Reference>

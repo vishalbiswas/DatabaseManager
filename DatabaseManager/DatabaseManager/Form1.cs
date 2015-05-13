@@ -11,6 +11,7 @@ using MySql.Data;
 using MySql.Data.MySqlClient;
 using Oracle.DataAccess.Client;
 using Npgsql;
+using IBM.Data.DB2;
 
 
 namespace DatabaseManager
@@ -26,7 +27,7 @@ namespace DatabaseManager
 
 		private void useDefault(object sender, EventArgs e)
 		{
-            if (comboBox1.SelectedItem.ToString() == "Oracle" || comboBox1.SelectedItem.ToString() == "PostgreSQL") textBox3.Enabled = label4.Enabled = true;
+            if (comboBox1.SelectedItem.ToString() == "Oracle" || comboBox1.SelectedItem.ToString() == "PostgreSQL" || comboBox1.SelectedItem.ToString() == "DB2") textBox3.Enabled = label4.Enabled = true;
             else textBox3.Enabled = label4.Enabled = false;
 			if (checkBox2.Checked == true)
 			{
@@ -44,6 +45,9 @@ namespace DatabaseManager
 						break;
                     case "PostgreSQL":
                         //to be implemented
+                        break;
+                    case "DB2":
+                        textBox1.Text = textBox2.Text = "";
                         break;
 				}
 				textBox1.Enabled = textBox2.Enabled = false;
@@ -108,7 +112,18 @@ namespace DatabaseManager
                     }
                     catch (NpgsqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
-			}
+                case "DB2":
+                    DB2Connection dconn = new DB2Connection("Server=localhost:50000;UserId=" + textBox1.Text + ";Password=" + textBox2.Text + ";Database=" + textBox3.Text);
+                    try
+                    {
+                        dconn.Open();
+                        dconn.Close();
+                        TableSelector TS = new TableSelector(dconn);
+                        TS.Show();
+                    }
+                    catch (DB2Exception err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    break;
+            }
 			foreach (Control control in Controls) control.Enabled = true;
 			Cursor = Cursors.Default;
 		}

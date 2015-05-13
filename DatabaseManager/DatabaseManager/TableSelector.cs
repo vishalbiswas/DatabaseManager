@@ -11,6 +11,7 @@ using MySql.Data;
 using MySql.Data.MySqlClient;
 using Oracle.DataAccess.Client;
 using Npgsql;
+using IBM.Data.DB2;
 
 namespace DatabaseManager
 {
@@ -20,14 +21,17 @@ namespace DatabaseManager
         SqlConnection mconn;
         OracleConnection oconn;
         NpgsqlConnection nconn;
+        DB2Connection dconn;
         MySqlCommand scom;
         SqlCommand mcom;
         OracleCommand ocom;
         NpgsqlCommand ncom;
+        DB2Command dcom;
         MySqlDataAdapter sad;
         SqlDataAdapter mad;
         OracleDataAdapter oad;
         NpgsqlDataAdapter nad;
+        DB2DataAdapter dad;
         DataSet ds = new DataSet();
         string da;
         public TableSelector(MySqlConnection con, string db)
@@ -80,6 +84,18 @@ namespace DatabaseManager
             foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
             nconn.Close();
         }
+        public TableSelector(DB2Connection con)
+        {
+            dconn = con;
+            dconn.Open();
+            dcom = new DB2Command("select tabname from syscat.tables;", dconn);
+            dcom.ExecuteNonQuery();
+            dad = new DB2DataAdapter(dcom);
+            dad.Fill(ds);
+            InitializeComponent();
+            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
+            dconn.Close();
+        }
 
         private void next(object sender, EventArgs e)
         {
@@ -101,6 +117,11 @@ namespace DatabaseManager
             else if (nconn != null)
             {
                 Database DB = new Database(nconn, listBox1.SelectedItem.ToString());
+                DB.Show();
+            }
+            else if (dconn != null)
+            {
+                Database DB = new Database(dconn, listBox1.SelectedItem.ToString());
                 DB.Show();
             }
             Close();
