@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using MySql.Data;
 using MySql.Data.MySqlClient;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using Npgsql;
 using IBM.Data.DB2;
 
@@ -17,114 +17,69 @@ namespace DatabaseManager
 {
     public partial class TableSelector : Form
     {
-        MySqlConnection sconn;
-        SqlConnection mconn;
-        OracleConnection oconn;
-        NpgsqlConnection nconn;
-        DB2Connection dconn;
-        MySqlCommand scom;
-        SqlCommand mcom;
-        OracleCommand ocom;
-        NpgsqlCommand ncom;
-        DB2Command dcom;
-        MySqlDataAdapter sad;
-        SqlDataAdapter mad;
-        OracleDataAdapter oad;
-        NpgsqlDataAdapter nad;
-        DB2DataAdapter dad;
-        DataSet ds = new DataSet();
-        string da;
-        public TableSelector(MySqlConnection con, string db)
+        internal Form MainForm;
+        object conn, da;
+        int dbtype;
+        string dbname;
+        public TableSelector(object con, int type, string db)
         {
-            da = db;
-            sconn = con;
-            sconn.Open();
-            scom = new MySqlCommand("use "+db+";show tables;", sconn);
-            scom.ExecuteNonQuery();
-            sad = new MySqlDataAdapter(scom);
-            sad.Fill(ds);
+            DataTable tb = new DataTable();
+            switch (type)
+            {
+                case 0:
+                    ((MySqlConnection)con).Open();
+                    da = new MySqlDataAdapter("use " + db + ";show tables;", (MySqlConnection)con);
+                    ((MySqlDataAdapter)da).Fill(tb);
+                    ((MySqlConnection)con).Close();
+                    break;
+                case 1:
+                    ((SqlConnection)con).Open();
+                    SqlDataAdapter mad = new SqlDataAdapter("use " + db + ";select table_name from information_schema.tables;", (SqlConnection)con);
+                    ((SqlDataAdapter)da).Fill(tb);
+                    ((SqlConnection)con).Close();
+                    break;
+                case 2:
+                    ((OracleConnection)con).Open();
+                    OracleDataAdapter oad = new OracleDataAdapter("select table_name from user_tables", (OracleConnection)con);
+                    ((OracleDataAdapter)da).Fill(tb);
+                    ((OracleConnection)con).Close();
+                    break;
+                case 3:
+                    ((NpgsqlConnection)con).Open();
+                    NpgsqlDataAdapter nad = new NpgsqlDataAdapter("select table_name from information_schema.tables where table_schema = 'public';", (NpgsqlConnection)conn);
+                    ((NpgsqlDataAdapter)da).Fill(tb);
+                    ((NpgsqlConnection)con).Close();
+                    break;
+                case 4:
+                    ((DB2Connection)con).Open();
+                    DB2DataAdapter dad = new DB2DataAdapter("use " + db + ";show tables;", (DB2Connection)con);
+                    ((DB2DataAdapter)da).Fill(tb);
+                    ((DB2Connection)con).Close();
+                    break;
+                default:
+                    break;
+            }
             InitializeComponent();
-            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
-            sconn.Close();
+            foreach (DataRow row in tb.Rows) listBox1.Items.Add(row[0]);
+            conn = con;
+            dbtype = type;
+            dbname = db;
         }
-        public TableSelector(SqlConnection con, string db)
+
+        private void showParent(object sender, EventArgs e)
         {
-            da = db;
-            mconn = con;
-            mconn.Open();
-            mcom = new SqlCommand("use " + db + ";select table_name from information_schema.tables;", mconn);
-            mcom.ExecuteNonQuery();
-            mad = new SqlDataAdapter(mcom);
-            mad.Fill(ds);
-            InitializeComponent();
-            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
-            mconn.Close();
-        }
-        public TableSelector(OracleConnection con)
-        {
-            oconn = con;
-            oconn.Open();
-            ocom = new OracleCommand("select table_name from user_tables", oconn);
-            ocom.ExecuteNonQuery();
-            oad = new OracleDataAdapter(ocom);
-            oad.Fill(ds);
-            InitializeComponent();
-            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
-            oconn.Close();
-        }
-        public TableSelector(NpgsqlConnection con)
-        {
-            nconn = con;
-            nconn.Open();
-            ncom = new NpgsqlCommand("select table_name from information_schema.tables where table_schema = 'public';", nconn);
-            ncom.ExecuteNonQuery();
-            nad = new NpgsqlDataAdapter(ncom);
-            nad.Fill(ds);
-            InitializeComponent();
-            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
-            nconn.Close();
-        }
-        public TableSelector(DB2Connection con)
-        {
-            dconn = con;
-            dconn.Open();
-            dcom = new DB2Command("select tabname from syscat.tables;", dconn);
-            dcom.ExecuteNonQuery();
-            dad = new DB2DataAdapter(dcom);
-            dad.Fill(ds);
-            InitializeComponent();
-            foreach (DataRow row in ds.Tables[0].Rows) listBox1.Items.Add(row[0]);
-            dconn.Close();
+            if (MainForm.Visible) return;
+            MainForm.Show();
+            Close();
         }
 
         private void next(object sender, EventArgs e)
         {
-            if (sconn != null)
-            {
-                Database DB = new Database(sconn, da, listBox1.SelectedItem.ToString());
-                DB.Show();
-            }
-            else if (mconn != null)
-            {
-                Database DB = new Database(mconn, da, listBox1.SelectedItem.ToString());
-                DB.Show();
-            }
-            else if (oconn != null)
-            {
-                Database DB = new Database(oconn, listBox1.SelectedItem.ToString());
-                DB.Show();
-            }
-            else if (nconn != null)
-            {
-                Database DB = new Database(nconn, listBox1.SelectedItem.ToString());
-                DB.Show();
-            }
-            else if (dconn != null)
-            {
-                Database DB = new Database(dconn, listBox1.SelectedItem.ToString());
-                DB.Show();
-            }
-            Close();
+            if (listBox1.SelectedItem == null) return;
+            Database DB = new Database(conn, dbtype, dbname, listBox1.SelectedItem.ToString());
+            DB.MainForm = MainForm;
+            DB.Show();
+            Hide();
         }
     }
 }

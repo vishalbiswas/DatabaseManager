@@ -9,123 +9,136 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using MySql.Data;
 using MySql.Data.MySqlClient;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using Npgsql;
 using IBM.Data.DB2;
 
 
 namespace DatabaseManager
 {
-	public partial class Form1 : Form
-	{
-		bool IntegrateSecurity = false;
-		public Form1()
-		{
-			InitializeComponent();
-			comboBox1.SelectedItem = "MySQL/MariaDB";
-		}
+    public partial class Form1 : Form
+    {
+        object conn;
+        bool IntegrateSecurity = false;
+        public Form1()
+        {
+            InitializeComponent();
+            comboBox1.SelectedItem = "MySQL/MariaDB";
+        }
 
-		private void useDefault(object sender, EventArgs e)
-		{
+        private void useDefault(object sender, EventArgs e)
+        {
             if (comboBox1.SelectedItem.ToString() == "Oracle" || comboBox1.SelectedItem.ToString() == "PostgreSQL" || comboBox1.SelectedItem.ToString() == "DB2") textBox3.Enabled = label4.Enabled = true;
             else textBox3.Enabled = label4.Enabled = false;
-			if (checkBox2.Checked == true)
-			{
-				switch (comboBox1.SelectedItem.ToString())
-				{
-					case "MySQL/MariaDB":
-						textBox1.Text = "root";
-						textBox2.Text = "";
-						break;
-					case "MSSQL":
-						IntegrateSecurity = true;
-						break;
-					case "Oracle":
-						//to be implemented
-						break;
+            if (checkBox2.Checked == true)
+            {
+                switch (comboBox1.SelectedItem.ToString())
+                {
+                    case "MySQL/MariaDB":
+                        textBox1.Text = "root";
+                        textBox2.Text = "";
+                        break;
+                    case "MSSQL":
+                        IntegrateSecurity = true;
+                        break;
+                    case "Oracle":
+                        //to be implemented
+                        break;
                     case "PostgreSQL":
                         //to be implemented
                         break;
                     case "DB2":
                         textBox1.Text = textBox2.Text = "";
                         break;
-				}
-				textBox1.Enabled = textBox2.Enabled = false;
-			}
-			else
-			{
-				IntegrateSecurity = false;
-				textBox1.Enabled = textBox2.Enabled = true;
-			}
-		}
+                }
+                textBox1.Enabled = textBox2.Enabled = false;
+            }
+            else
+            {
+                IntegrateSecurity = false;
+                textBox1.Enabled = textBox2.Enabled = true;
+            }
+        }
 
-		private void connect(object sender, EventArgs e)
-		{
-			foreach (Control control in Controls) control.Enabled = false;
-			Cursor = Cursors.WaitCursor;
-			switch (comboBox1.SelectedItem.ToString()) {
-				case "MySQL/MariaDB":
-					MySqlConnection sconn = new MySqlConnection("user=" + textBox1.Text + ";password=" + textBox2.Text + ";server=localhost;port=3306");
-					try
-					{
-						sconn.Open();
-						sconn.Close();
-                        DatabaseSelector DS = new DatabaseSelector(sconn);
+        private void connect(object sender, EventArgs e)
+        {
+            foreach (Control control in Controls) control.Enabled = false;
+            Cursor = Cursors.WaitCursor;
+            switch (comboBox1.SelectedItem.ToString())
+            {
+                case "MySQL/MariaDB":
+                    conn = new MySqlConnection("user=" + textBox1.Text + ";password=" + textBox2.Text + ";server=localhost;port=3306");
+                    try
+                    {
+                        ((MySqlConnection)conn).Open();
+                        ((MySqlConnection)conn).Close();
+                        DatabaseSelector DS = new DatabaseSelector(conn, comboBox1.SelectedIndex);
+                        DS.MainForm = this;
                         DS.Show();
-					}
-					catch (MySqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
-					break;
-				case "MSSQL":
+                        Hide();
+                    }
+                    catch (MySqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    break;
+                case "MSSQL":
                     string constr;
                     if (IntegrateSecurity) constr = "Data Source=localhost;Integrated Security=true";
                     else constr = "Data Source=localhost;Integrated Security=false;User ID = " + textBox1.Text + "; Password = " + textBox2.Text;
-                    SqlConnection mconn = new SqlConnection(constr);
+                    conn = new SqlConnection(constr);
                     try
                     {
-                        mconn.Open();
-                        mconn.Close();
-                        DatabaseSelector DS = new DatabaseSelector(mconn);
+                        ((SqlConnection)conn).Open();
+                        ((SqlConnection)conn).Close();
+                        DatabaseSelector DS = new DatabaseSelector(conn, comboBox1.SelectedIndex);
+                        DS.MainForm = this;
                         DS.Show();
+                        Hide();
                     }
                     catch (SqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
-				case "Oracle":
-                    //to be implemented
-                    OracleConnection oconn = new OracleConnection("User Id=" + textBox1.Text + ";Password=" + textBox2.Text + ";Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SID="+textBox3.Text+")));");
+                case "Oracle":
+                    conn = new OracleConnection("User Id=" + textBox1.Text + ";Password=" + textBox2.Text + ";Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SID=" + textBox3.Text + ")));");
                     try
                     {
-                        oconn.Open();
-                        oconn.Close();
-                        TableSelector TS = new TableSelector(oconn);
+                        ((OracleConnection)conn).Open();
+                        ((OracleConnection)conn).Close();
+                        TableSelector TS = new TableSelector(conn, comboBox1.SelectedIndex, textBox3.Text);
+                        TS.MainForm = this;
                         TS.Show();
+                        Hide();
                     }
                     catch (OracleException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
                 case "PostgreSQL":
-                    NpgsqlConnection nconn = new NpgsqlConnection("Server=localhost;Port=5432;User Id=" + textBox1.Text + ";Password=" + textBox2.Text + ";Database=" + textBox3.Text + ";");
+                    conn = new NpgsqlConnection("Server=localhost;Port=5432;User Id=" + textBox1.Text + ";Password=" + textBox2.Text + ";Database=" + textBox3.Text + ";");
                     try
                     {
-                        nconn.Open();
-                        nconn.Close();
-                        TableSelector TS = new TableSelector(nconn);
+                        ((NpgsqlConnection)conn).Open();
+                        ((NpgsqlConnection)conn).Close();
+                        TableSelector TS = new TableSelector(conn, comboBox1.SelectedIndex, textBox3.Text);
+                        TS.MainForm = this;
                         TS.Show();
+                        Hide();
                     }
                     catch (NpgsqlException err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
                 case "DB2":
-                    DB2Connection dconn = new DB2Connection("Server=localhost:50000;UserId=" + textBox1.Text + ";Password=" + textBox2.Text + ";Database=" + textBox3.Text);
-                    try
-                    {
-                        dconn.Open();
-                        dconn.Close();
-                        TableSelector TS = new TableSelector(dconn);
+                    try {
+                        conn = new DB2Connection("Server=localhost:50000;UserId=" + textBox1.Text + ";Password=" + textBox2.Text + ";Database=" + textBox3.Text);
+                        ((DB2Connection)conn).Open();
+                        ((DB2Connection)conn).Close();
+                        TableSelector TS = new TableSelector(conn, comboBox1.SelectedIndex, textBox3.Text);
+                        TS.MainForm = this;
                         TS.Show();
+                        Hide();
                     }
+                    catch (DllNotFoundException err) { MessageBox.Show("Make sure you have DB2 client installed.\r\n" + err.Message, "Error Occurred!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     catch (DB2Exception err) { MessageBox.Show(err.Message, "Error Occured!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
-            }
-			foreach (Control control in Controls) control.Enabled = true;
-			Cursor = Cursors.Default;
-		}
-	}
+                default:
+                    break;
+                    }
+            foreach (Control control in Controls) control.Enabled = true;
+            Cursor = Cursors.Default;
+        }
+    }
 }

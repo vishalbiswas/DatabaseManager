@@ -59,6 +59,7 @@
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(278, 220);
             this.listBox1.TabIndex = 0;
+            this.listBox1.DoubleClick += new System.EventHandler(this.next);
             // 
             // panel1
             // 
@@ -82,12 +83,15 @@
             // 
             // DatabaseSelector
             // 
+            this.AcceptButton = this.button1;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.Controls.Add(this.tableLayoutPanel1);
+            this.MaximizeBox = false;
             this.Name = "DatabaseSelector";
             this.Text = "Select Database";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.showParent);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
